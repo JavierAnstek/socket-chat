@@ -16,10 +16,13 @@ io.on('connection', (client) => {
         /** UNE AL USUARIO A UNA SALA */
         client.join(data.sala);
 
-        let usersList = users.agregarPersona(client.id, data.nombre, data.sala);
-        let mensaje = crearMsg('Administrador', `${data.nombre} Ingresó`);
+        // agrega usuario a la sala de chat
+        users.agregarPersona(client.id, data.nombre, data.sala);
+        // let usersCon = users.getPersonasSala(data.sala);
+        // informa a todos los usuarios que alguien se conectó
+        client.broadcast.to(data.sala).emit('crearMsg', crearMsg('Administrador', `${data.nombre} se conectó`));
         // envía la lista los nuevos participantes a todas las personas de la sala
-        client.broadcast.to(data.sala).emit('listaPersonas', mensaje);
+        client.broadcast.to(data.sala).emit('listaPersonas', users.getPersonasSala(data.sala));
         callback(users.getPersonasSala(data.sala));
     });
 
@@ -39,8 +42,8 @@ io.on('connection', (client) => {
 
         let usuario = users.getpersona(client.id);
         let mensaje = crearMsg(usuario.nombre, data.mensaje);
-        client.broadcast.to(usuario.sala).emit('listaPersonas', mensaje);
-        callback({ msg: 'Mensaje enviado' });
+        client.broadcast.to(usuario.sala).emit('crearMsg', mensaje);
+        callback(mensaje);
     });
 
     client.on('mensajePrivado', (data, callback) => {

@@ -20,32 +20,31 @@ var usuario = {
 socket.on('connect', function() {
     // envía info de conexión al chat
     socket.emit('entrarChat', usuario, function(resp) {
-        if (resp.error === true)
+        if (resp.error === true) {
             console.log(resp.msg);
-        else
-            console.log('Usuarios conectados: ', resp);
+        } else {
+            // renderiza usuarios conectados
+            renderUsers(resp);
+        }
     });
     console.log('Conectado al servidor');
 });
 
 /** Escucha desconexión del servidor */
 socket.on('disconnect', function() {
-    console.log('Perdimos conexión con el servidor');
+    // console.log('Perdimos conexión con el servidor');
 });
 
-// Enviar información
-socket.emit('crearMensaje', { mensaje: 'Hola Mundo' }, function(resp) {
-    // console.log('respuesta server: ', resp);
-});
-
-// Escuchar cuando un usuario sale del chat
+// Escuchar cuando un usuario envia un mensaje del chat
 socket.on('crearMsg', function(mensaje) {
-    console.log('Servidor:', mensaje);
+    rendesMsg(mensaje, false);
+    scrollBottom();
 });
 
 // Escuchar cuando un usuario entra o sale del chat
 socket.on('listaPersonas', function(mensaje) {
-    console.log(`[${mensaje.nombre}]: ${mensaje.msg}`);
+    // renderiza usuarios conectados
+    renderUsers(mensaje);
 });
 
 // envíe mensaje privado
